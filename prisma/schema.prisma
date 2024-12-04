@@ -1,0 +1,202 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+model User {
+  id            String        @id @default(cuid()) @map("_id")
+  username      String?
+  email         String?
+  publicAddress String        @unique
+  nonce         Int
+  rewardNonce   Int           @default(0)
+  balance       Float         @default(0)
+  nodes         Node[]        @relation("nodes")
+  rentals       Node[]        @relation("rentals")
+  tasks         Task[]
+  images        Image[]
+  aiModel       AIModel[]
+  instances     Instance[]
+  transactions  Transaction[]
+  rewards       Reward[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  keyPair       keyPair?
+  sshPublicKey  String?
+}
+
+model Node {
+  id            String    @id @default(cuid()) @map("_id")
+  name          String
+  gpu           Json?
+  storage       Json?
+  cpu           Json?
+  network       Json?
+  status        String    @default("idle")
+  isConnected   Boolean   @default(false)
+  rewardLendId  String    
+  price         Float     @default(0)
+  socketId      String?
+  owner         User      @relation(name: "nodes", fields: [ownerId], references: [id])
+  ownerId       String
+  tasks         Task[]
+  keyPairs      keyPair[]
+  rewards       Reward[]
+  rentedBy      User?     @relation(name: "rentals", fields: [rentedById], references: [id])
+  rentedById    String?
+  startedAt     DateTime?
+  expireAt      DateTime?
+  publicIp      String?
+  port          Int?      @default(22)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model AIModel {
+  id        String   @id @default(cuid()) @map("_id")
+  modelName String   @unique
+  type      String
+  url       String
+  configUrl String
+  otherUrl  Json
+  framework String?
+  version   String?
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  tasks     Task[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Task {
+  id                 String     @id @default(cuid()) @map("_id")
+  title              String
+  description        String?
+  taskType           String
+  status             TaskStatus @default(PENDING)
+  user               User       @relation(fields: [userId], references: [id])
+  userId             String
+  aiModel            AIModel    @relation(fields: [aiModelid], references: [id])
+  aiModelid          String
+  trainingData       Json
+  trainingParameters Json
+  nodeId             String?
+  node               Node?      @relation(fields: [nodeId], references: [id])
+  logs               Json[]     @default([])
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+}
+
+model Image {
+  id        String   @id @default(cuid()) @map("_id")
+  type      String?
+  url       String
+  prompt    String?
+  model     String?
+  size      String?
+  quality   String?
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model InstanceType {
+  id        String     @id @default(cuid()) @map("_id")
+  type      String
+  cpu       Json
+  gpu       Json
+  network   Json
+  storage   Json
+  instance  Instance[]
+  price     Float      @default(0)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Instance {
+  id             String       @id @default(cuid()) @map("_id")
+  instanceId     String       @unique
+  instanceType   InstanceType @relation(fields: [instanceTypeId], references: [id])
+  instanceTypeId String
+  expireAt       DateTime
+  publicIp       String?
+  user           User         @relation(fields: [userId], references: [id])
+  userId         String
+  keyName        String
+  status         String       @default("pending")
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model keyPair {
+  id             String   @id @default(cuid()) @map("_id")
+  keyFingerprint String   @unique
+  keyMaterial    String
+  keyName        String   @unique
+  keyPairId      String?
+  // instanceId     String?
+  publicKey      String?
+  status         String   @default("good")
+  user           User     @relation(fields: [userId], references: [id])
+  userId         String   @unique
+  node           Node     @relation(fields: [nodeId], references: [id])
+  nodeId         String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Transaction {
+  id        String   @id @default(cuid()) @map("_id")
+  txHash    String   @unique
+  from      String
+  to        String
+  value     String
+  type      String
+  status    String   @default("pending")
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PricePair {
+  id        String   @id @default(cuid()) @map("_id")
+  currency  String
+  pair      String
+  price     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([pair, currency], name: "pair_currency")
+}
+
+model Reward {
+  id            String        @id @default(cuid()) @map("_id")
+  user          User          @relation(fields: [userId], references: [id])
+  userId        String
+  node          Node          @relation(fields: [nodeId], references: [id])
+  nodeId        String
+  amount        Float         @default(0)
+  claimedAmount Float         @default(0)
+  startDate     DateTime      @default(now())
+  endDate       DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}

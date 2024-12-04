@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",              // Target latest ECMAScript features supported by Node.js
+    "module": "commonjs",            // CommonJS modules for Node.js compatibility
+    "outDir": "./dist",              // Compiled JS files
+    "rootDir": "./src",              // Root directory of source files
+    "strict": true,                  // Enable all strict type-checking options
+    "esModuleInterop": true,         // Enable ES6 module interoperability
+    "skipLibCheck": true,            // Skip type checking of all declaration files
+    "forceConsistentCasingInFileNames": true, // Force file names to be consistent in casing
+    "moduleResolution": "node",      // Use Node.js module resolution
+    "resolveJsonModule": true,       // Allow importing JSON files
+    "isolatedModules": true,         // Ensure each file can be safely transpiled without relying on other imports
+    "allowSyntheticDefaultImports": true, // Allow default imports from modules with no default exports
+    "noImplicitReturns": true,       // Disallow functions that do not return a value from returning undefined
+    "noFallthroughCasesInSwitch": true, // Disallow fallthrough of case statements in switch statements
+    "baseUrl": ".", // This must be specified if "paths" is set
+    "paths": {
+      "@/*": ["src/*"] // Maps all imports starting with "@" to the "src" directory
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "tests"]
+}

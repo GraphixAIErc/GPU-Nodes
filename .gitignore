@@ -1,0 +1,12 @@
+node_modules
+# Keep environment variables out of version control
+.env
+
+
+uploads
+
+.package-lock.json
+
+tmp.md
+
+dist/
