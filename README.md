@@ -51,7 +51,7 @@ Use the provided terminal commands to establish an SSH connection with the rente
 ---
 
 ### 8. Decentralized Contribution via CLI
-If you have spare GPU capacity, you can contribute to the decentralized network by lending out your GPU resources through the <a href="https://github.com/" target="_blank">Graphix AI Command Line Interface (CLI)</a> By leveraging this tool, you can securely lend GPU power to support various computational tasks and earn revenue while contributing to decentralized computing.
+If you have spare GPU capacity, you can contribute to the decentralized network by lending out your GPU resources through the <a href="https://github.com/GraphixAIErc/Graphix-AI-CLI" target="_blank">Graphix AI Command Line Interface (CLI)</a> By leveraging this tool, you can securely lend GPU power to support various computational tasks and earn revenue while contributing to decentralized computing.
 
 ### Additional Notes
 Ensure a stable internet connection during the node operation.
